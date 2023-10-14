@@ -1,10 +1,23 @@
 import './App.css';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 
 function App() {
   const [name,setName]=useState('');
   const [datetime,setDatetime]=useState('');
   const [description,setDescription]=useState('');
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(()=>{
+    
+  gettransactions().then(setTransactions);
+  },[]);
+
+  async function gettransactions(){
+    const url="http://localhost:4040/api"+"/transactions";
+    const response = await fetch(url);
+    return await response.json();
+  };
+
   function addnewtransaction(ev){
     ev.preventDefault();
     
@@ -28,9 +41,18 @@ function App() {
     });
   });
   }
+  let balance=0;
+  transactions.forEach(transaction=>{
+    balance+=transaction.price;
+  });
+
+  balance=balance.toFixed(2);
+  const dollars=balance.split(".")[0];
+  const cents=balance.split(".")[1];
+
   return (
     <main>
-      <h1>$400<span>.00</span></h1>
+      <h1>{dollars}<span>{cents}</span></h1>
       <form onSubmit={addnewtransaction}>
         <div className="basics">
           <input type="text" 
@@ -51,47 +73,27 @@ function App() {
         </div>
 
         <button type="submit">Add new Transaction</button>
-        
+      
       </form>
 
       <div className="transactions">
-        <div className="transaction">
+        {transactions.length>0 && transactions.map(transaction => (
+          <div className="transaction">
           <div className="left">
-            <div className="name"> New Samsung TV</div>
-            <div className="description"> Previous TV was broken</div>
+            <div className="name">{transaction.name}</div>
+            <div className="description"> {transaction.description}</div>
           </div>
 
           <div className="right">
-            <div className="price red">-$200</div>
+            <div className={"price "+ (transaction.price<0? 'red':'green')}>
+              {transaction.price}</div>
             <div className="datetime">2023-10-14 15:45</div> 
           </div>
         </div>
 
-        <div className="transaction">
-          <div className="left">
-            <div className="name"> Paid from Internship</div>
-            <div className="description">Money for work</div>
-          </div>
 
-          <div className="right">
-            <div className="price green">+$1200</div>
-            <div className="datetime">2023-10-15 16:20</div> 
-          </div>
-
-        </div>
-
-        <div className="transaction">
-          <div className="left">
-            <div className="name"> Iphone</div>
-            <div className="description"> New Tech </div>
-          </div>
-
-          <div className="right">
-            <div className="price red">-$1000</div>
-            <div className="datetime">2023-10-19 12:00</div> 
-          </div>
-
-        </div>
+        ))}
+        
       </div>
     </main>
   );

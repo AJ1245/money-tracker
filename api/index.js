@@ -22,6 +22,15 @@ app.post('/api/transaction',async (req,res)=>{
 
 });
 
+app.get('/api/transactions',async (req,res)=>{
+    MONGO_URL="mongodb+srv://money:qwerty123@cluster0.cgsc7xu.mongodb.net/?retryWrites=true&w=majority";    
+    await mongoose.connect(MONGO_URL);
+
+    const transactions = await Transaction.find();
+    res.json(transactions);
+
+});
+
 app.listen(4040,()=>{
     console.log('server is running on port 4040');
 });
