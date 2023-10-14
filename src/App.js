@@ -1,17 +1,53 @@
 import './App.css';
+import {useState} from 'react';
 
 function App() {
+  const [name,setName]=useState('');
+  const [datetime,setDatetime]=useState('');
+  const [description,setDescription]=useState('');
+  function addnewtransaction(ev){
+    ev.preventDefault();
+    
+   const url="http://localhost:4040/api"+"/transaction";
+   const price=name.split(" ")[0];
+   fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      price,
+      name:name.substring(price.length+1),
+      description,
+      datetime,
+    }),
+  }).then((response) => {
+    response.json().then((json) => {
+        setName("");
+        setDatetime("");
+        setDescription("");
+      console.log("result", json);
+    });
+  });
+  }
   return (
     <main>
       <h1>$400<span>.00</span></h1>
-      <form>
+      <form onSubmit={addnewtransaction}>
         <div className="basics">
-          <input type="text" placeholder="+200 New Samsung TV"></input>
-          <input type="datetime-local"></input>
+          <input type="text" 
+                  value={name} 
+                  onChange ={ev=>setName(ev.target.value)}
+                  placeholder="+200 New Samsung TV"></input>
+          <input value={datetime}
+                  onChange ={ev=>setDatetime(ev.target.value)}
+                  type="datetime-local"></input>
+                
         </div>
 
         <div className="description">
-          <input type="text" placeholder="Decsription"></input>
+          <input type="text" 
+                  value={description}
+                  onChange ={ev=>setDescription(ev.target.value)}
+                 placeholder="Decsription"></input>
         </div>
 
         <button type="submit">Add new Transaction</button>
